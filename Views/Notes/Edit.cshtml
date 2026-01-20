@@ -1,0 +1,102 @@
+﻿@model Notes
+
+<h1>📝 Новая заметка</h1>
+
+<div class="container">
+    <form method="post" asp-action="Edit">
+        <div class="form-group">
+            <label for="Title">Заголовок</label>
+            <input type="text" asp-for="Title" id="Title" required />
+        </div>
+
+        <div class="form-group">
+            <label for="Content">Содержание</label>
+            <textarea asp-for="Content" id="Content" rows="6" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-add">💾 Сохранить</button>
+        <a href="/Notes/Index" class="btn_back">⬅ Назад</a>
+
+    </form>
+</div>
+
+<style>
+    body {
+        background-color: ghostwhite;
+        font-family: 'Times New Roman', Times, serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        margin: 50px 0 20px;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 25px;
+        border-radius: 10px;
+        background-color: azure;
+        box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+    }
+
+    input[type="text"], textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    .btn-add {
+        display: inline-block;
+        padding: 10px 18px;
+        background: #4CAF50;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .btn-add:hover {
+            background: #45a049;
+        }
+
+    .btn_back {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 8px 14px;
+        background: #bdc3c7;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background 0.2s;
+    }
+
+        .btn_back:hover {
+            background: #95a5a6;
+        }
+</style>
