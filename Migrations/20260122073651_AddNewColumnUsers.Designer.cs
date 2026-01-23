@@ -11,8 +11,8 @@ using NotesApp.Data;
 namespace NotesApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251001071808_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260122073651_AddNewColumnUsers")]
+    partial class AddNewColumnUsers
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,6 +58,9 @@ namespace NotesApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("EmailConfirmationToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EmailSent")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsEmailConfirmed")

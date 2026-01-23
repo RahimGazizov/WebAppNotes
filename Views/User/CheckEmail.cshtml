@@ -1,4 +1,5 @@
-﻿@{
+﻿@model User
+@{
     ViewData["Title"] = "Подтверждение Email";
 }
 
@@ -25,37 +26,81 @@
             margin-bottom: 20px;
         }
 
-        .confirmation-container p {
-            color: #718093;
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 30px;
+    .time {
+        color: gray;
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .confirmation-container p {
+        color: #718093;
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 30px;
+    }
+
+    .confirmation-container .icon {
+        font-size: 50px;
+        color: #44bd32;
+        margin-bottom: 20px;
+    }
+
+    a {
+        color: black;
+        text-decoration: none;
+        text-align: center;
+    }
+
+        a:hover {
+            color: blue;
         }
 
-        .confirmation-container .icon {
-            font-size: 50px;
-            color: #44bd32;
-            margin-bottom: 20px;
-        }
+    .confirmation-container a.button {
+        display: inline-block;
+        text-decoration: none;
+        background-color: #273c75;
+        color: #ffffff;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
 
-        .confirmation-container a.button {
-            display: inline-block;
-            text-decoration: none;
-            background-color: #273c75;
-            color: #ffffff;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.3s;
+        .confirmation-container a.button:hover {
+            background-color: #192a56;
         }
-
-            .confirmation-container a.button:hover {
-                background-color: #192a56;
-            }
 </style>
 
 <div class="confirmation-container">
-    <div class="icon">📧</div>
-    <h2>Ожидание подтверждения Email!</h2>
-    <p>На ваш почтовый ящик отправлено письмо. Пожалуйста, перейдите по ссылке в письме, чтобы подтвердить свой адрес.</p>
+    <div class="icon">
+        📧
+        @if (!Model.IsEmailConfirmed)
+        {
+            <h2>Ожидание подтверждения Email!</h2>
+            <p>На ваш почтовый ящик отправлено письмо. Пожалуйста, перейдите по ссылке в письме, чтобы подтвердить свой адрес.</p>
+            <div id="timer" class="time"></div>
+        }
+        else
+        {
+            <h2>Почта подтверждена</h2>
+            <p class="btn_a"><a href="/Authorization/Index">Перейти на авторизацию</a></p>
+        }
+    </div>
 </div>
+<script>
+    let emailSent = new Date('@Model.EmailSent.ToString("o")');
+    let deadline = new Date(emailSent.getTime() + 5 * 60 * 1000);
+
+    let interval = setInterval(function(){
+        let timeEnd = deadline - new Date();
+        if(timeEnd <= 0){
+            clearInterval(interval);
+            window.location.href = '@Url.Action("CheckEmail", "User")';
+        }
+        else{
+            let minutes = Math.floor(timeEnd / 60000);
+            let seconds = Math.floor((timeEnd % 60000) / 1000);
+            document.getElementById('timer').innerHTML = 'Осталось: ' + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+        }
+    },1000);
+</script>

@@ -11,5 +11,6 @@ namespace NotesApp.Models
         public string Password { get; set; }
         public string? EmailConfirmationToken {  get; set; }
         public bool IsEmailConfirmed { get; set; }
+        public DateTime EmailSent { get; set; }
     }
 }

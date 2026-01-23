@@ -16,17 +16,24 @@ namespace NotesApp.Controllers
             _context = context;
             _settings = setting;
         }
-        public IActionResult Index()
+        public IActionResult Index(string? error)
         {
+            //_context.Users.RemoveRange(_context.Users);
+            //_context.SaveChanges();
+            TempData["ErrorMessage"] = error;
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> Index(User user)
         {
-            //_context.Users.RemoveRange(_context.Users);
-            //_context.SaveChanges();
             User hasEmail = _context.Users.FirstOrDefault(u => u.Email == user.Email);
-            if (hasEmail != null)
+            if (hasEmail != null && !hasEmail.IsEmailConfirmed)
+            {
+                _context.Users.Remove(hasEmail);
+                _context.SaveChanges();
+                return View();
+            }
+            if (hasEmail != null && hasEmail.IsEmailConfirmed)
             {
                 TempData["ErrorMessage"] = "Такая почта уже существует";
                 return View();
@@ -37,7 +44,8 @@ namespace NotesApp.Controllers
                 Email = user.Email,
                 Password = HashPassword(user.Password),
                 EmailConfirmationToken = Guid.NewGuid().ToString(),
-                IsEmailConfirmed = false
+                IsEmailConfirmed = false,
+                EmailSent = DateTime.Now.AddMinutes(5),
             };
             _context.Users.Add(users);
             _context.SaveChanges();
@@ -67,11 +75,23 @@ namespace NotesApp.Controllers
             {
                 TempData["ErrorMessage"] = ex.Message;
             }
-            return RedirectToAction("CheckEmail");
+            return RedirectToAction("CheckEmail", new { id = users.Id });
         }
-        public IActionResult CheckEmail()
+        public IActionResult CheckEmail(int id)
         {
-            return View();
+            User user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if(user == null)
+            {
+                return RedirectToAction("Index", new { error = "Юзер был пустой" });
+            }
+            DateTime endTime = user.EmailSent;
+            if (DateTime.Now > endTime)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+                return RedirectToAction("Index", new { error = "Вы не подтвердили почту" });
+            }
+            return View(user);
         }
         public IActionResult ConfirmEmail(int userId, string token)
         {
@@ -84,7 +104,7 @@ namespace NotesApp.Controllers
             user.EmailConfirmationToken = null;
             user.IsEmailConfirmed = true;
             _context.SaveChanges();
-            return RedirectToAction("Index","Authorization");
+            return RedirectToAction("CheckEmail", new { id = userId });
         }
         private string HashPassword(string password)
         {

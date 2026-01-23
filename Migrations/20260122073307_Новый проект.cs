@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NotesApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Новыйпроект : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,8 @@ namespace NotesApp.Migrations
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Password = table.Column<string>(type: "TEXT", nullable: false),
                     EmailConfirmationToken = table.Column<string>(type: "TEXT", nullable: true),
-                    IsEmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsEmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    EmailSent = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
