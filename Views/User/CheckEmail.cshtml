@@ -88,7 +88,7 @@
     </div>
 </div>
 <script>
-    let emailSent = new Date('@Model.EmailSent.ToString("o")');
+    let emailSent = new Date();
     let deadline = new Date(emailSent.getTime() + 5 * 60 * 1000);
 
     let interval = setInterval(function(){
