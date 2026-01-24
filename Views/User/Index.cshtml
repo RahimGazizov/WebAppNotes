@@ -1,10 +1,13 @@
 ﻿@model User
 <h1>Регистрация</h1>
-@if (TempData["ErrorMessage"] != null){
-    <div style="color: red;font-size: 18px;font-weight: bold;">
-        @TempData["ErrorMessage"]</div>
-}
+
 <div class="conteiner">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div style="color: red;font-size: 18px;font-weight: bold;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
     <form method="post" asp-action="Index">
         <label>Имя</label>
         <input type="text" asp-for="Name" required />
