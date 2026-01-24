@@ -11,8 +11,9 @@
         <label>Пароль</label>
         <input type="text" asp-for="Password" required />
         <button type="submit" class="btn_add">Войти</button>
-        <div style="text-align: center;margin-top:10px;">
+        <div style="display: flex;justify-content:center;gap:10px;">
             <a href="/User/Index" class="btn_not">Нет аккаунта?</a>
+            <a href="/User/GetEmail" class="btn_not">Забыли пароль?</a>
         </div>
     </form>
 </div>
@@ -41,7 +42,7 @@
         box-shadow: 0 6px 8px rgba(0,0,0,0.1);
     }
 
-    
+
     form {
         display: flex;
         flex-direction: column;
