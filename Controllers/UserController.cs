@@ -2,19 +2,24 @@
 using NotesApp.Data;
 using NotesApp.Models;
 using NotesApp.SendEmail;
+using NotesApp.Service;
 using System.Net.Mail;
 using System.Security.Cryptography;
-
 namespace NotesApp.Controllers
 {
     public class UserController : Controller
     {
         private readonly AppDbContext _context;
         private readonly SettingEmail _settings;
-        public UserController(AppDbContext context, SettingEmail setting)
+        private readonly ResetPassword _reset;
+        private readonly HashPassword.HashCode _hash;
+        public UserController(AppDbContext context, SettingEmail setting, 
+            ResetPassword reset,HashPassword.HashCode hash)
         {
             _context = context;
             _settings = setting;
+            _reset = reset;
+            _hash = hash;
         }
         public IActionResult Index(string? error)
         {
@@ -42,7 +47,7 @@ namespace NotesApp.Controllers
             {
                 Name = user.Name,
                 Email = user.Email,
-                Password = HashPassword(user.Password),
+                Password = _hash.HashPassword(user.Password),
                 EmailConfirmationToken = Guid.NewGuid().ToString(),
                 IsEmailConfirmed = false,
                 EmailSent = DateTime.Now.AddMinutes(5),
@@ -80,7 +85,7 @@ namespace NotesApp.Controllers
         public IActionResult CheckEmail(int id)
         {
             User user = _context.Users.FirstOrDefault(u => u.Id == id);
-            if(user == null)
+            if (user == null)
             {
                 return RedirectToAction("Index", new { error = "Юзер был пустой" });
             }
@@ -106,19 +111,66 @@ namespace NotesApp.Controllers
             _context.SaveChanges();
             return RedirectToAction("CheckEmail", new { id = userId });
         }
-        private string HashPassword(string password)
+        public IActionResult GetEmail() => View();
+        [HttpPost]
+        public IActionResult GetEmail(string email)
         {
-            byte[] salt = new byte[16];
-            using (var rgb = RandomNumberGenerator.Create())
+            var result = _reset.StartReset(email);
+            if (!result.Success)
             {
-                rgb.GetBytes(salt);
+                TempData["ErrorMessage"] = result.Message;
+                return View();
             }
-            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
-            byte[] hash = pbkdf2.GetBytes(32);
-            byte[] hashCode = new byte[48];
-            Array.Copy(salt, 0, hashCode, 0, 16);
-            Array.Copy(hash, 0, hashCode, 16, hash.Length);
-            return Convert.ToBase64String(hashCode);
+            return RedirectToAction("ConfirmNum", new { id = result.Id });
         }
+        public IActionResult ConfirmNum(int id)
+        {
+            User user = GetUser(id);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Пользователь не найден";
+                return View();
+            }
+            return View(user);
+        }
+        [HttpPost]
+        public IActionResult ConfirmNum(int id, int userNum)
+        {
+            var result = _reset.ConfNumber(id, userNum);
+            if (!result.Success)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return View(GetUser(id));
+            }
+            return RedirectToAction("ResetPassword", new { id = result.Id });
+        }
+        public IActionResult ResetPassword(int id)
+        {
+            User user = GetUser(id);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Пользователь не найден";
+                return View();
+            }
+            return View(user);
+        }
+        [HttpPost]
+        public IActionResult ResetPassword(int id, string password, string confiredPassword)
+        {
+            if (password != confiredPassword)
+            {
+                TempData["ErrorMessage"] = "Пароли не совпадают";
+                return View(GetUser(id));
+            }
+            var result = _reset.ResPassword(id, password);
+            if (!result.Success)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return View(GetUser(id));
+            }
+            return RedirectToAction("Index", "Authorization");
+        }
+        private User GetUser(int id) => _context.Users.FirstOrDefault(u => u.Id == id);
+        
     }
 }
