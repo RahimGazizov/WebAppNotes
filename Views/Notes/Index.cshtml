@@ -1,8 +1,11 @@
 ﻿@model List<Notes>
-
+@using System.Security.Claims
+@{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
 <h1>📒 Заметки</h1>
 <div class="action">
-    <a href="@Url.Action("Profile","User")" class="btn_prof">Профиль</a>
+    <a href="/User/Profile/@userId" class="btn_prof">Профиль</a>
 </div>
 <div class="container">
     <a href="/Notes/AddNewNote" class="btn_add">➕ Добавить заметку</a>
@@ -76,22 +79,22 @@
 
     .action {
         margin: 15px;
-        text-align: left;
     }
 
     .btn_prof {
-        width: 100px;
+        width: 150px;
         display: inline-block;
-        padding: 8px 12px;
+        padding: 10px 15px;
+        margin-top: 10px; /* чуть ниже другой кнопки */
         text-decoration: none;
-        border-radius: 5px;
-        background-color: #4CAF50;
+        border-radius: 8px;
+        background-color: #4CAF50; /* серый, чтобы отличать от зеленой кнопки */
         color: white;
-        transition: transform 0.3s ease-in-out;
-        box-sizing: border-box;
-        white-space:nowrap;
-        overflow: hidden;
-        text-overflow:ellipsis;
+        font-size: 18px;
+        font-weight: 500;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease-in-out;
+        text-align: center;
     }
 
         .btn_prof:hover {
