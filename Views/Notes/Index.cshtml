@@ -1,7 +1,9 @@
 ﻿@model List<Notes>
 
 <h1>📒 Заметки</h1>
-
+<div class="action">
+    <a href="@Url.Action("Profile","User")" class="btn_prof">Профиль</a>
+</div>
 <div class="container">
     <a href="/Notes/AddNewNote" class="btn_add">➕ Добавить заметку</a>
 
@@ -71,6 +73,33 @@
         margin: 5px 0;
         font-size: 18px;
     }
+
+    .action {
+        margin: 15px;
+        text-align: left;
+    }
+
+    .btn_prof {
+        width: 100px;
+        display: inline-block;
+        padding: 8px 12px;
+        text-decoration: none;
+        border-radius: 5px;
+        background-color: #4CAF50;
+        color: white;
+        transition: transform 0.3s ease-in-out;
+        box-sizing: border-box;
+        white-space:nowrap;
+        overflow: hidden;
+        text-overflow:ellipsis;
+    }
+
+        .btn_prof:hover {
+            color: white;
+            background-color: #4CAF50;
+            transform: scale(1.1);
+        }
+
 
     .btn_add {
         display: inline-block;
