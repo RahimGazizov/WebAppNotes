@@ -4,7 +4,7 @@
     {
         <div style="color:red;margin: 10px;font-size:20px;font-weight:bold;">@TempData["ErrorMessage"]</div>
     }
-    <form method="post" asp-action="GetEmail">
+    <form method="post" action="GetEmail">
         <label>Введите почту</label>
         <input type="text" name="email" required />
         <button class="btn_send">Отправить</button>
