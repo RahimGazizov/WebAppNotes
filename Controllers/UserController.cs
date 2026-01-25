@@ -3,6 +3,7 @@ using NotesApp.Data;
 using NotesApp.Models;
 using NotesApp.SendEmail;
 using NotesApp.Service;
+using NotesApp.ViewModels;
 using System.Net.Mail;
 using System.Security.Cryptography;
 namespace NotesApp.Controllers
@@ -13,13 +14,15 @@ namespace NotesApp.Controllers
         private readonly SettingEmail _settings;
         private readonly ResetPassword _reset;
         private readonly HashPassword.HashCode _hash;
-        public UserController(AppDbContext context, SettingEmail setting, 
-            ResetPassword reset,HashPassword.HashCode hash)
+        private readonly ChangePassword _changePassword;
+        public UserController(AppDbContext context, SettingEmail setting,
+            ResetPassword reset, HashPassword.HashCode hash, ChangePassword changePassword)
         {
             _context = context;
             _settings = setting;
             _reset = reset;
             _hash = hash;
+            _changePassword = changePassword;
         }
         public IActionResult Index(string? error)
         {
@@ -146,31 +149,56 @@ namespace NotesApp.Controllers
         }
         public IActionResult ResetPassword(int id)
         {
-            User user = GetUser(id);
-            if (user == null)
+            ProfileViewModel model = new ProfileViewModel();
+            model.User = GetUser(id);
+            if (model.User == null)
             {
                 TempData["ErrorMessage"] = "Пользователь не найден";
                 return View();
             }
-            return View(user);
+            return View(model);
         }
         [HttpPost]
-        public IActionResult ResetPassword(int id, string password, string confiredPassword)
+        public IActionResult ResetPassword(ProfileViewModel profile)
         {
-            if (password != confiredPassword)
+            if (profile.Password.NewPassword != profile.Password.ConfirmPassword)
             {
                 TempData["ErrorMessage"] = "Пароли не совпадают";
-                return View(GetUser(id));
+                return View(GetUser(profile.User.Id));
             }
-            var result = _reset.ResPassword(id, password);
+            var result = _reset.ResPassword(profile.User.Id, profile.Password.NewPassword);
             if (!result.Success)
             {
                 TempData["ErrorMessage"] = result.Message;
-                return View(GetUser(id));
+                return View(GetUser(profile.User.Id));
             }
             return RedirectToAction("Index", "Authorization");
         }
+        public IActionResult Profile(int id)
+        {
+            var user = GetUser(id);
+            if (user == null)
+                return RedirectToAction("Index", new { error = "Пользователь не найден" });
+            return View(user);
+        }
+        public IActionResult ChangePassword(int id)
+        {
+            ProfileViewModel profile = new ProfileViewModel();
+            profile.User = GetUser(id);
+            return View(profile);
+        }
+        [HttpPost]
+        public IActionResult ChangePassword(ProfileViewModel profile)
+        {
+            var result = _changePassword.Change(profile);
+            if (!result.Success)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return View(profile);
+            }
+            return RedirectToAction("Profile", "User", new { id = profile.User.Id });
+        }
         private User GetUser(int id) => _context.Users.FirstOrDefault(u => u.Id == id);
-        
+
     }
 }
