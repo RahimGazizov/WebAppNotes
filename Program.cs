@@ -15,6 +15,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddTransient<EmailSettings>();
 builder.Services.AddScoped<SettingEmail>();
 builder.Services.AddScoped<ResetPassword>();
+builder.Services.AddScoped<ChangePassword>();
 builder.Services.AddSingleton<NotesApp.HashPassword.HashCode>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
      options.ExpireTimeSpan = TimeSpan.FromHours(5));
