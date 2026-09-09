@@ -20,7 +20,11 @@ builder.Services.AddSingleton<NotesApp.HashPassword.HashCode>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
      options.ExpireTimeSpan = TimeSpan.FromHours(5));
 var app = builder.Build();
-
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
